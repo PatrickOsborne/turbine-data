@@ -3,12 +3,12 @@ package org.ozzysoft.turbinedata.turbine.generator
 import grizzled.slf4j.Logger
 import org.scalatest.{FunSuite, Matchers}
 
-class IntegerGeneratorUnitTest extends FunSuite with Matchers {
+class IntGeneratorUnitTest extends FunSuite with Matchers {
 
   val logger = Logger(getClass)
 
   test("constant int generator") {
-    val g = IntegerConstantGenerator(1)
+    val g = IntConstantGenerator(1)
     g.value shouldBe 1
     g.stringValue shouldBe "1"
 
@@ -18,7 +18,7 @@ class IntegerGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("sum int generator with constants") {
-    val g = IntegerConstantGenerator(1) + IntegerConstantGenerator(5)
+    val g = IntConstantGenerator(1) + IntConstantGenerator(5)
 
     g.value shouldBe 6
     g.stringValue shouldBe "6"
@@ -29,7 +29,7 @@ class IntegerGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("int seq generator") {
-    val g = new IntegerSequenceGenerator(0 to 2)
+    val g = new IntSequenceGenerator(0 to 2)
 
     g.value shouldBe 0
     g.stringValue shouldBe "0"
@@ -56,7 +56,7 @@ class IntegerGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("int seq generator with generate") {
-    val g = new IntegerSequenceGenerator(0 to 2)
+    val g = new IntSequenceGenerator(0 to 2)
 
     (0 to 6) foreach { i =>
       val value = g.generate
@@ -66,7 +66,7 @@ class IntegerGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("sum int generator with seq generator using generate") {
-    val g = IntegerConstantGenerator(1) + IntegerSequenceGenerator(0 to 2)
+    val g = IntConstantGenerator(1) + IntSequenceGenerator(0 to 2)
 
     (1 to 5) foreach { loop =>
       (0 to 2) foreach { i =>
@@ -77,7 +77,7 @@ class IntegerGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("sum int generator with seq using next") {
-    val g = IntegerConstantGenerator(3) + IntegerSequenceGenerator(0 to 2)
+    val g = IntConstantGenerator(3) + IntSequenceGenerator(0 to 2)
 
     (0 to 2) foreach { i =>
       if (i != 0) g.next()
@@ -93,7 +93,7 @@ class IntegerGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("sum int generators using next") {
-    val g = IntegerFunctionGenerator.sum(Seq(IntegerConstantGenerator(3), IntegerSequenceGenerator(0 to 2), IntegerSequenceGenerator(0 to 2)))
+    val g = IntFunctionGenerator.sum(Seq(IntConstantGenerator(3), IntSequenceGenerator(0 to 2), IntSequenceGenerator(0 to 2)))
 
     (0 to 2) foreach { i =>
       if (i != 0) g.next()
@@ -109,8 +109,8 @@ class IntegerGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("sum of nested int generators") {
-    val a = IntegerFunctionGenerator.sum(Seq(IntegerConstantGenerator(7), IntegerSequenceGenerator(3 to 5)))
-    val g = IntegerFunctionGenerator.sum(Seq(IntegerConstantGenerator(3), IntegerSequenceGenerator(0 to 2), a))
+    val a = IntFunctionGenerator.sum(Seq(IntConstantGenerator(7), IntSequenceGenerator(3 to 5)))
+    val g = IntFunctionGenerator.sum(Seq(IntConstantGenerator(3), IntSequenceGenerator(0 to 2), a))
 
     (1 to 5) foreach { loop =>
       (0 to 2) foreach { i =>
