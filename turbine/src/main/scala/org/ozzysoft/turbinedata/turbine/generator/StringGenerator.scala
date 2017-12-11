@@ -3,6 +3,7 @@ package org.ozzysoft.turbinedata.turbine.generator
 import grizzled.slf4j.Logger
 
 object StringGenerator {
+  def apply(s: String): StringGenerator = StringConstantGenerator(s)
 }
 
 trait StringGenerator extends Generator[String] {
@@ -10,6 +11,12 @@ trait StringGenerator extends Generator[String] {
   def stringValue: String = value
 
   def +(g: StringGenerator): StringGenerator
+
+}
+
+trait StringGeneratorLike {
+
+  def toStringGenerator: StringGenerator
 
 }
 
@@ -41,11 +48,11 @@ class StringFunctionGenerator(f: () => String, generators: Generator[_]*) extend
   def value: String = f()
 }
 
-object ConstantStringGenerator {
-  def apply(s: String): ConstantStringGenerator = new ConstantStringGenerator(s)
+object StringConstantGenerator {
+  def apply(s: String): StringConstantGenerator = new StringConstantGenerator(s)
 }
 
-class ConstantStringGenerator(s: String) extends AbstractStringGenerator() {
+class StringConstantGenerator(s: String) extends AbstractStringGenerator() {
 
   def value: String = s
 }

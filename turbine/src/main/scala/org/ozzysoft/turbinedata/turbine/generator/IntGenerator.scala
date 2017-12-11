@@ -3,9 +3,10 @@ package org.ozzysoft.turbinedata.turbine.generator
 import grizzled.slf4j.Logger
 
 object IntGenerator {
+  def apply(x: Int): IntGenerator = IntConstantGenerator(x)
 }
 
-trait IntGenerator extends Generator[Int] {
+trait IntGenerator extends Generator[Int] with StringGeneratorLike {
 
   def +(g: IntGenerator): IntGenerator
 

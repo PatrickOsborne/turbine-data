@@ -7,7 +7,7 @@ import scala.collection.immutable
 class StringGeneratorUnitTest extends FunSuite with Matchers {
 
   test("constant string generator") {
-    val g = ConstantStringGenerator("const")
+    val g = StringConstantGenerator("const")
     g.stringValue shouldBe "const"
 
     g.next()
@@ -48,7 +48,7 @@ class StringGeneratorUnitTest extends FunSuite with Matchers {
   test("concatenate string generator with constants") {
     val range: immutable.Seq[Int] = 0 to 3
     val chars = range map { i => (i + 'a'.toInt).toChar }
-    val generators = chars map { c => ConstantStringGenerator(c.toString) }
+    val generators = chars map { c => StringConstantGenerator(c.toString) }
 
     val g = StringFunctionGenerator.concatenate(generators)
 
