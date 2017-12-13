@@ -22,13 +22,13 @@ trait IntGenerator extends Generator[Int] with StringGeneratorLike {
 
 }
 
-abstract class AbstractIntGenerator(generators: Generator[_]*) extends IntGenerator {
+abstract class AbstractIntGenerator(generators: Seq[Generator[_]] = Seq.empty) extends IntGenerator {
 
   private val logger = Logger(getClass)
 
   def +(g: IntGenerator): IntGenerator = {
     val method = () => value + g.value
-    new AbstractIntGenerator(Seq(this, g): _*) {
+    new AbstractIntGenerator(Seq(this, g)) {
       override def value: Int = method()
     }
   }
@@ -51,7 +51,7 @@ object IntFunctionGenerator {
 
 }
 
-class IntFunctionGenerator(f: () => Int, generators: Generator[_]*) extends AbstractIntGenerator(generators: _*) {
+class IntFunctionGenerator(f: () => Int, generators: Generator[_]*) extends AbstractIntGenerator(generators: Seq[Generator[_]]) {
 
   override def value: Int = f()
 
