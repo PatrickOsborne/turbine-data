@@ -20,13 +20,13 @@ trait StringGeneratorLike {
 
 }
 
-abstract class AbstractStringGenerator(generators: Generator[_]*) extends StringGenerator {
+abstract class AbstractStringGenerator(generators: Seq[Generator[_]] = Seq.empty) extends StringGenerator {
 
   override def next(): Unit = generators.foreach(g => g.next())
 
   def +(g: StringGenerator): StringGenerator = {
     val method: () => String = () => value + g.value
-    new AbstractStringGenerator(Seq(this, g): _*) {
+    new AbstractStringGenerator(Seq(this, g)) {
       override def value: String = method()
     }
   }
@@ -43,7 +43,7 @@ object StringFunctionGenerator {
   }
 }
 
-class StringFunctionGenerator(f: () => String, generators: Generator[_]*) extends AbstractStringGenerator(generators: _*) {
+class StringFunctionGenerator(f: () => String, generators: Generator[_]*) extends AbstractStringGenerator(generators) {
 
   def value: String = f()
 }
