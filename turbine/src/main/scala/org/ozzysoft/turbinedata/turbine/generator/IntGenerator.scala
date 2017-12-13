@@ -10,6 +10,8 @@ trait IntGenerator extends Generator[Int] with StringGeneratorLike {
 
   def +(g: IntGenerator): IntGenerator
 
+  def *(g: IntGenerator): IntGenerator
+
   def intValue: Int = value
 
   def stringValue: String = {
@@ -17,7 +19,7 @@ trait IntGenerator extends Generator[Int] with StringGeneratorLike {
   }
 
   def toStringGenerator: StringGenerator = {
-    new StringFunctionGenerator(stringValue _, this)
+    StringFunctionGenerator(stringValue _, this)
   }
 
 }
@@ -33,6 +35,13 @@ abstract class AbstractIntGenerator(generators: Seq[Generator[_]] = Seq.empty) e
     }
   }
 
+  def *(g: IntGenerator): IntGenerator = {
+    val method = () => value * g.value
+    new AbstractIntGenerator(Seq(this, g)) {
+      override def value: Int = method()
+    }
+  }
+
   override def next(): Unit = {
     generators.foreach(g => g.next())
   }
@@ -42,16 +51,17 @@ abstract class AbstractIntGenerator(generators: Seq[Generator[_]] = Seq.empty) e
 object IntFunctionGenerator {
 
   def sum(generators: Seq[IntGenerator]): IntGenerator = {
-    new IntFunctionGenerator(() => sumFunction(generators)().value, generators: _*)
+    new IntFunctionGenerator(() => sumFunction(generators)().value, generators)
   }
 
   def sumFunction(generators: Seq[IntGenerator]): () => IntGenerator = {
     () => generators.reduce((a, b) => a + b)
   }
 
+  def apply(f: () => Int, generator: Generator[_]): IntFunctionGenerator = new IntFunctionGenerator(f, Seq(generator))
 }
 
-class IntFunctionGenerator(f: () => Int, generators: Generator[_]*) extends AbstractIntGenerator(generators: Seq[Generator[_]]) {
+class IntFunctionGenerator(f: () => Int, generators: Seq[Generator[_]] = Seq.empty) extends AbstractIntGenerator(generators: Seq[Generator[_]]) {
 
   override def value: Int = f()
 

@@ -39,11 +39,13 @@ object StringFunctionGenerator {
   }
 
   def concatenate(generators: Seq[StringGenerator]): StringFunctionGenerator = {
-    new StringFunctionGenerator(() => concatenateFunction(generators)().value, generators: _*)
+    new StringFunctionGenerator(() => concatenateFunction(generators)().value, generators)
   }
+
+  def apply(f: () => String, generator: Generator[_]): StringFunctionGenerator = new StringFunctionGenerator(f, Seq(generator))
 }
 
-class StringFunctionGenerator(f: () => String, generators: Generator[_]*) extends AbstractStringGenerator(generators) {
+class StringFunctionGenerator(f: () => String, generators: Seq[Generator[_]] = Seq.empty) extends AbstractStringGenerator(generators) {
 
   def value: String = f()
 }
