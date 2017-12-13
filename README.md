@@ -2,6 +2,12 @@
 
 Provides a library to generate test data for your favorite project.
 
+
+## License 
+
+Licensed under Apache 2.0 License.  See License file.
+
+
 ## Overview
 
 
