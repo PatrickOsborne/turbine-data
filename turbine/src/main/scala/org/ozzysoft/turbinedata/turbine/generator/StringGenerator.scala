@@ -59,7 +59,7 @@ class StringConstantGenerator(s: String) extends AbstractStringGenerator() {
   def value: String = s
 }
 
-class StringSequenceGenerator(seq: Seq[String]) extends AbstractStringGenerator() {
+class StringClosedSetGenerator(seq: Seq[String]) extends AbstractStringGenerator() {
 
   val logger = Logger(getClass)
 

@@ -73,11 +73,11 @@ object IntConstantGenerator {
 
 class IntConstantGenerator(i: Int) extends IntFunctionGenerator(() => i) {}
 
-object IntSequenceGenerator {
-  def apply(seq: Seq[Int]): IntSequenceGenerator = new IntSequenceGenerator(seq)
+object IntClosedSetGenerator {
+  def apply(seq: Seq[Int]): IntClosedSetGenerator = new IntClosedSetGenerator(seq)
 }
 
-class IntSequenceGenerator(seq: Seq[Int]) extends AbstractIntGenerator() {
+class IntClosedSetGenerator(seq: Seq[Int]) extends AbstractIntGenerator() {
 
   private val logger = Logger(getClass)
 

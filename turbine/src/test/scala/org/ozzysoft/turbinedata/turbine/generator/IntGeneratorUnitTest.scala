@@ -29,7 +29,7 @@ class IntGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("int seq generator") {
-    val g = new IntSequenceGenerator(0 to 2)
+    val g = new IntClosedSetGenerator(0 to 2)
 
     g.value shouldBe 0
     g.stringValue shouldBe "0"
@@ -56,7 +56,7 @@ class IntGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("int seq generator with generate") {
-    val g = new IntSequenceGenerator(0 to 2)
+    val g = new IntClosedSetGenerator(0 to 2)
 
     (0 to 6) foreach { i =>
       val value = g.generate
@@ -66,7 +66,7 @@ class IntGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("sum int generator with seq generator using generate") {
-    val g = IntConstantGenerator(1) + IntSequenceGenerator(0 to 2)
+    val g = IntConstantGenerator(1) + IntClosedSetGenerator(0 to 2)
 
     (1 to 5) foreach { loop =>
       (0 to 2) foreach { i =>
@@ -77,7 +77,7 @@ class IntGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("sum int generator with seq using next") {
-    val g = IntConstantGenerator(3) + IntSequenceGenerator(0 to 2)
+    val g = IntConstantGenerator(3) + IntClosedSetGenerator(0 to 2)
 
     (0 to 2) foreach { i =>
       if (i != 0) g.next()
@@ -93,7 +93,7 @@ class IntGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("sum int generators using next") {
-    val g = IntFunctionGenerator.sum(Seq(IntConstantGenerator(3), IntSequenceGenerator(0 to 2), IntSequenceGenerator(0 to 2)))
+    val g = IntFunctionGenerator.sum(Seq(IntConstantGenerator(3), IntClosedSetGenerator(0 to 2), IntClosedSetGenerator(0 to 2)))
 
     (0 to 2) foreach { i =>
       if (i != 0) g.next()
@@ -109,8 +109,8 @@ class IntGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("sum of nested int generators") {
-    val a = IntFunctionGenerator.sum(Seq(IntConstantGenerator(7), IntSequenceGenerator(3 to 5)))
-    val g = IntFunctionGenerator.sum(Seq(IntConstantGenerator(3), IntSequenceGenerator(0 to 2), a))
+    val a = IntFunctionGenerator.sum(Seq(IntConstantGenerator(7), IntClosedSetGenerator(3 to 5)))
+    val g = IntFunctionGenerator.sum(Seq(IntConstantGenerator(3), IntClosedSetGenerator(0 to 2), a))
 
     (1 to 5) foreach { loop =>
       (0 to 2) foreach { i =>

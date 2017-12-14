@@ -7,7 +7,7 @@ class CsvGeneratorUnitTest extends FunSuite with Matchers {
 
   val logger = Logger(getClass)
 
-  test("generate csv") {
+  test("generate csv with next()") {
     val a1 = new ClosedSetCharStringGenerator('a', 2)
     val a2 = new ClosedSetCharStringGenerator('b', 2)
     val a3 = new ClosedSetCharStringGenerator('c', 2)
@@ -25,6 +25,22 @@ class CsvGeneratorUnitTest extends FunSuite with Matchers {
     g.next()
     logger.info(g.value)
     g.value shouldBe "a, b, c"
+  }
+
+  test("generate csv with generate()") {
+    val a1 = new ClosedSetCharStringGenerator('a', 2)
+    val a2 = new ClosedSetCharStringGenerator('b', 2)
+    val a3 = new ClosedSetCharStringGenerator('c', 2)
+    val generators = Seq(a1, a2, a3)
+
+    val g = new CsvGenerator(generators)
+
+    g.generate shouldBe "a, b, c"
+    logger.info(g.value)
+    g.generate shouldBe "b, c, d"
+    logger.info(g.value)
+    g.generate shouldBe "a, b, c"
+    logger.info(g.value)
   }
 
 }
