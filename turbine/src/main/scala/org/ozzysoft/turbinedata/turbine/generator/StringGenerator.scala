@@ -59,30 +59,46 @@ class StringConstantGenerator(s: String) extends AbstractStringGenerator() {
   def value: String = s
 }
 
-class StringClosedSetGenerator(seq: Seq[String]) extends AbstractStringGenerator() {
+object StringClosedSetGenerator {
+
+  def withCallNextOnRollover(seq: Seq[String], onRolloverGenerator: Generator[_]): StringClosedSetGenerator = {
+    new StringClosedSetGenerator(seq, Some(() => onRolloverGenerator.next()))
+  }
+}
+
+class StringClosedSetGenerator(seq: Seq[String], override val maybeOnRollover: Option[() => Unit] = None)
+  extends AbstractStringGenerator with ClosedSetGenerator[String] {
 
   val logger = Logger(getClass)
 
   private var count = 0
 
   override def next(): Unit = {
-    if (count >= (seq.size - 1)) {
+    count += 1
+    if (count >= seq.size) {
       count = 0
+      onRollover()
     }
-    else count += 1
   }
 
   override def value: String = {
     seq(count)
   }
+
 }
 
-class ClosedSetCharStringGenerator(startingChar: Char, count: Int = 4) extends AbstractStringGenerator {
+class ClosedSetCharStringGenerator(startingChar: Char, count: Int = 4, override val maybeOnRollover: Option[() => Unit] = None)
+  extends AbstractStringGenerator with ClosedSetGenerator[String] {
+
   private var counter = 0
   private val range: Seq[Int] = 0 until count
 
   override def next(): Unit = {
     counter += 1
+    if (counter >= range.size) {
+      counter = 0
+      onRollover()
+    }
   }
 
   def value: String = {

@@ -52,7 +52,6 @@ class IntGeneratorUnitTest extends FunSuite with Matchers {
     g.next()
     g.value shouldBe 1
     g.stringValue shouldBe "1"
-
   }
 
   test("int seq generator with generate") {

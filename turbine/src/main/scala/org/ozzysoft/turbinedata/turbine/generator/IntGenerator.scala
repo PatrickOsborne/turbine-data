@@ -77,17 +77,18 @@ object IntClosedSetGenerator {
   def apply(seq: Seq[Int]): IntClosedSetGenerator = new IntClosedSetGenerator(seq)
 }
 
-class IntClosedSetGenerator(seq: Seq[Int]) extends AbstractIntGenerator() {
+class IntClosedSetGenerator(seq: Seq[Int], maybeOnRollover: Option[() => Unit] = None) extends AbstractIntGenerator() with ClosedSetGenerator[Int] {
 
   private val logger = Logger(getClass)
 
   private var count = 0
 
   override def next(): Unit = {
-    if (count >= (seq.size - 1)) {
+    count += 1
+    if (count >= seq.size) {
       count = 0
+      onRollover()
     }
-    else count += 1
   }
 
   override def value: Int = {
@@ -95,7 +96,7 @@ class IntClosedSetGenerator(seq: Seq[Int]) extends AbstractIntGenerator() {
   }
 }
 
-class SimpleIntGenerator(initialValue: Int = 0) extends AbstractIntGenerator {
+class SimpleIntGenerator(initialValue: Int = 0) extends AbstractIntGenerator() with ClosedSetGenerator[Int] {
   private var counter = initialValue
 
   override def next(): Unit = {

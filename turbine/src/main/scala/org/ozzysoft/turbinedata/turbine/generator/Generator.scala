@@ -22,3 +22,13 @@ trait Generator[T] {
   }
 
 }
+
+trait ClosedSetGenerator[T] extends Generator[T] {
+
+  protected val maybeOnRollover: Option[() => Unit] = None
+
+  protected def onRollover(): Unit = {
+    maybeOnRollover.foreach(f => f())
+  }
+
+}
