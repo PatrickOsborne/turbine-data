@@ -1,4 +1,4 @@
-package org.ozzysoft.turbinedata.turbine.generator
+package org.ozzysoft.turbinedata.turbine.generator.core
 
 class CsvGenerator(generators: Seq[Generator[String]]) extends AbstractStringGenerator(generators) {
 

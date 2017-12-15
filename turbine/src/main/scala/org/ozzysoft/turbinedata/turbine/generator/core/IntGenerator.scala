@@ -1,4 +1,4 @@
-package org.ozzysoft.turbinedata.turbine.generator
+package org.ozzysoft.turbinedata.turbine.generator.core
 
 import grizzled.slf4j.Logger
 
