@@ -2,21 +2,14 @@ package org.ozzysoft.turbinedata.turbine.generator
 
 import grizzled.slf4j.Logger
 
-object IntGenerator {
+object IntGenerators {
   def apply(x: Int): IntGenerator = IntConstantGenerator(x)
+
+  def wrapperWithoutNext(g: IntGenerator): IntGenerator = new IntFunctionGenerator(() => g.value)
+
 }
 
-trait IntGenerator extends Generator[Int] with StringGeneratorLike {
-
-  def +(g: IntGenerator): IntGenerator
-
-  def *(g: IntGenerator): IntGenerator
-
-  def intValue: Int = value
-
-  def stringValue: String = {
-    String.valueOf(value)
-  }
+trait IntGeneratorConvertsToStringGenerator extends IntGenerator with ConvertsToStringGenerator {
 
   def toStringGenerator: StringGenerator = {
     StringFunctionGenerator(stringValue _, this)
@@ -24,7 +17,7 @@ trait IntGenerator extends Generator[Int] with StringGeneratorLike {
 
 }
 
-abstract class AbstractIntGenerator(generators: Seq[Generator[_]] = Seq.empty) extends IntGenerator {
+abstract class AbstractIntGenerator(generators: Seq[Generator[_]] = Seq.empty) extends IntGeneratorConvertsToStringGenerator {
 
   private val logger = Logger(getClass)
 
@@ -77,7 +70,8 @@ object IntClosedSetGenerator {
   def apply(seq: Seq[Int]): IntClosedSetGenerator = new IntClosedSetGenerator(seq)
 }
 
-class IntClosedSetGenerator(seq: Seq[Int], maybeOnRollover: Option[() => Unit] = None) extends AbstractIntGenerator() with ClosedSetGenerator[Int] {
+class IntClosedSetGenerator(seq: Seq[Int], maybeOnRollover: Option[() => Unit] = None)
+  extends AbstractIntGenerator() with AbstractClosedSetGenerator[Int] {
 
   private val logger = Logger(getClass)
 
@@ -96,7 +90,7 @@ class IntClosedSetGenerator(seq: Seq[Int], maybeOnRollover: Option[() => Unit] =
   }
 }
 
-class SimpleIntGenerator(initialValue: Int = 0) extends AbstractIntGenerator() with ClosedSetGenerator[Int] {
+class SimpleIntGenerator(initialValue: Int = 0) extends AbstractIntGenerator() with AbstractClosedSetGenerator[Int] {
   private var counter = initialValue
 
   override def next(): Unit = {

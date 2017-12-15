@@ -57,7 +57,7 @@ class StringGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("concatenate string generator varying generators") {
-    val generators = Seq(new ClosedSetCharStringGenerator('a', 4), new ClosedSetCharStringGenerator('p', 4))
+    val generators = Seq(new StringClosedSetCharGenerator('a', 4), new StringClosedSetCharGenerator('p', 4))
     val g = StringFunctionGenerator.concatenate(generators)
 
     g.stringValue shouldBe "ap"
@@ -73,8 +73,8 @@ class StringGeneratorUnitTest extends FunSuite with Matchers {
   }
 
   test("nested concatenated string generator") {
-    val generators = Seq(new ClosedSetCharStringGenerator('a', 4), new ClosedSetCharStringGenerator('p', 4))
-    val g = StringFunctionGenerator.concatenate(Seq(new ClosedSetCharStringGenerator('j', 4), StringFunctionGenerator.concatenate(generators)))
+    val generators = Seq(new StringClosedSetCharGenerator('a', 4), new StringClosedSetCharGenerator('p', 4))
+    val g = StringFunctionGenerator.concatenate(Seq(new StringClosedSetCharGenerator('j', 4), StringFunctionGenerator.concatenate(generators)))
 
     val results = List("jap", "kbq", "lcr", "mds")
     val indices = 0 to 8

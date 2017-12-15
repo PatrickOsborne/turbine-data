@@ -23,12 +23,86 @@ trait Generator[T] {
 
 }
 
+trait StringGenerator extends Generator[String] {
+
+  def stringValue: String = value
+
+  def +(g: StringGenerator): StringGenerator
+
+}
+
+trait IntGenerator extends Generator[Int] with ConvertsToStringGenerator {
+
+  def +(g: IntGenerator): IntGenerator
+
+  def *(g: IntGenerator): IntGenerator
+
+  def intValue: Int = value
+
+  def stringValue: String = {
+    String.valueOf(value)
+  }
+
+}
+
+trait LongGenerator extends Generator[Long] with ConvertsToStringGenerator {
+
+  def +(g: IntGenerator): LongGenerator
+
+  def *(g: IntGenerator): LongGenerator
+
+  def longValue: Long = value
+
+  def stringValue: String = {
+    String.valueOf(value)
+  }
+
+}
+
+trait FloatGenerator extends Generator[Float] with ConvertsToStringGenerator {
+
+  def +(g: IntGenerator): FloatGenerator
+
+  def *(g: IntGenerator): FloatGenerator
+
+  def floatValue: Float = value
+
+  def stringValue: String = {
+    String.valueOf(value)
+  }
+
+}
+
+trait DoubleGenerator extends Generator[Double] with ConvertsToStringGenerator {
+
+  def +(g: IntGenerator): DoubleGenerator
+
+  def *(g: IntGenerator): DoubleGenerator
+
+  def doubleValue: Double = value
+
+  def stringValue: String = {
+    String.valueOf(value)
+  }
+
+}
+
 trait ClosedSetGenerator[T] extends Generator[T] {
 
-  protected val maybeOnRollover: Option[() => Unit] = None
+  def addRolloverListener(f: () => Unit): Unit
+
+}
+
+trait AbstractClosedSetGenerator[T] extends ClosedSetGenerator[T] {
+
+  protected var rolloverListeners: Seq[() => Unit] = List.empty
+
+  override def addRolloverListener(f: () => Unit): Unit = {
+    rolloverListeners = f +: rolloverListeners
+  }
 
   protected def onRollover(): Unit = {
-    maybeOnRollover.foreach(f => f())
+    rolloverListeners.foreach(f => f())
   }
 
 }

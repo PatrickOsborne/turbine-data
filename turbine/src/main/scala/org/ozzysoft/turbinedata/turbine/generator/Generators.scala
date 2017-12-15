@@ -2,9 +2,9 @@ package org.ozzysoft.turbinedata.turbine.generator
 
 object Generators {
 
-  def apply(s: String): StringGenerator = StringGenerator(s)
+  def apply(s: String): StringGenerator = StringGenerators(s)
 
-  def apply(i: Int): IntGenerator = IntGenerator(i)
+  def apply(i: Int): IntGenerator = IntGenerators(i)
 
   def apply(objects: Seq[Any]): Seq[Generator[_]] = {
     objects map {
@@ -18,7 +18,9 @@ object Generators {
   def stringGenerators(objects: Seq[Any]): Seq[StringGenerator] = {
     Generators(objects) map {
       case i: IntGenerator => i.toStringGenerator
-      case g: StringGeneratorLike => g.toStringGenerator
+      case convertsToString: ConvertsToStringGenerator => convertsToString.toStringGenerator
+      case s: StringGenerator => s
+      case gs: Generator[String] => StringFunctionGenerator(gs)
       case x => throw new RuntimeException(s"unable to map object to generator ($x)")
     }
   }

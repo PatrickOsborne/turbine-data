@@ -2,19 +2,11 @@ package org.ozzysoft.turbinedata.turbine.generator
 
 import grizzled.slf4j.Logger
 
-object StringGenerator {
+object StringGenerators {
   def apply(s: String): StringGenerator = StringConstantGenerator(s)
 }
 
-trait StringGenerator extends Generator[String] {
-
-  def stringValue: String = value
-
-  def +(g: StringGenerator): StringGenerator
-
-}
-
-trait StringGeneratorLike {
+trait ConvertsToStringGenerator {
 
   def toStringGenerator: StringGenerator
 
@@ -42,6 +34,8 @@ object StringFunctionGenerator {
     new StringFunctionGenerator(() => concatenateFunction(generators)().value, generators)
   }
 
+  def apply(g: Generator[String]): StringFunctionGenerator = StringFunctionGenerator(() => g.value, g)
+
   def apply(f: () => String, generator: Generator[_]): StringFunctionGenerator = new StringFunctionGenerator(f, Seq(generator))
 }
 
@@ -54,7 +48,7 @@ object StringConstantGenerator {
   def apply(s: String): StringConstantGenerator = new StringConstantGenerator(s)
 }
 
-class StringConstantGenerator(s: String) extends AbstractStringGenerator() {
+class StringConstantGenerator(s: String) extends AbstractStringGenerator() with AbstractClosedSetGenerator[String] {
 
   def value: String = s
 }
@@ -64,10 +58,21 @@ object StringClosedSetGenerator {
   def withCallNextOnRollover(seq: Seq[String], onRolloverGenerator: Generator[_]): StringClosedSetGenerator = {
     new StringClosedSetGenerator(seq, Some(() => onRolloverGenerator.next()))
   }
+
+  def closedSetGenerator(prefix: String, setGenerator: ClosedSetGenerator[_] with ConvertsToStringGenerator,
+    maybeOnRollover: Option[() => Unit] = None): ClosedSetGenerator[String] = {
+    val f = () => (new StringConstantGenerator(prefix) + setGenerator.toStringGenerator).value
+    val g = new StringFunctionGenerator(f, List(setGenerator)) with AbstractClosedSetGenerator[String]
+    maybeOnRollover.foreach(f => setGenerator.addRolloverListener(f))
+    g
+  }
+
 }
 
-class StringClosedSetGenerator(seq: Seq[String], override val maybeOnRollover: Option[() => Unit] = None)
-  extends AbstractStringGenerator with ClosedSetGenerator[String] {
+class StringClosedSetGenerator(seq: Seq[String], maybeOnRollover: Option[() => Unit] = None)
+  extends AbstractStringGenerator with AbstractClosedSetGenerator[String] {
+
+  maybeOnRollover.foreach(f => addRolloverListener(f))
 
   val logger = Logger(getClass)
 
@@ -87,8 +92,10 @@ class StringClosedSetGenerator(seq: Seq[String], override val maybeOnRollover: O
 
 }
 
-class ClosedSetCharStringGenerator(startingChar: Char, count: Int = 4, override val maybeOnRollover: Option[() => Unit] = None)
-  extends AbstractStringGenerator with ClosedSetGenerator[String] {
+class StringClosedSetCharGenerator(startingChar: Char, count: Int = 4, maybeOnRollover: Option[() => Unit] = None)
+  extends AbstractStringGenerator with AbstractClosedSetGenerator[String] {
+
+  maybeOnRollover.foreach(f => addRolloverListener(f))
 
   private var counter = 0
   private val range: Seq[Int] = 0 until count
